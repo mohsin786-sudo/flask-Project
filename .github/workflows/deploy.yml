@@ -25,7 +25,7 @@ jobs:
           docker stop flask-app || true
           docker rm flask-app || true
           docker rmi flask-app || true
-          cd flask-cicd-demo || git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-          cd YOUR_REPO_NAME
+          cd flask-cicd-demo || git clone https://github.com/https://github.com/mohsin786-sudo
+          cd https://github.com/mohsin786-sudo/flask-Project
           docker build -t flask-app .
           docker run -d -p 80:80 --name flask-app flask-app
