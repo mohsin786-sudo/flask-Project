@@ -1,17 +1,10 @@
-- name: Deploy to EC2
-  uses: appleboy/ssh-action@master
-  with:
-    host: ${{ secrets.EC2_HOST }}
-    username: ubuntu
-    key: ${{ secrets.EC2_KEY }}
-    port: 22
-    script: |
-      docker stop flask-app || true
-      docker rm flask-app || true
-      docker rmi flask-app || true
-      cd flask-cicd-demo || git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-      cd YOUR_REPO_NAME
-      docker build -t flask-app .
-      docker run -d -p 80:80 --name flask-app flask-app
-
-       
+script: |
+  docker stop flask-app || true
+  docker rm flask-app || true
+  docker rmi flask-app || true
+  if [ ! -d flask-cicd-demo ]; then
+    git clone https://github.com/REAL_USERNAME/REAL_REPO_NAME.git flask-cicd-demo
+  fi
+  cd flask-cicd-demo
+  docker build -t flask-app .
+  docker run -d -p 80:80 --name flask-app flask-app
