@@ -2,28 +2,41 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_KEY }}
-        port: 22
-        script: |
-          docker stop flask-app || true
-          docker rm flask-app || true
-          docker rmi flask-app || true
-          cd ~/flask-Project || git clone https://github.com/mohsin786-sudo/flask-Project.git ~/flask-Project
-          cd ~/flask-Project
-          docker build -t flask-app .
-          docker run -d -p 80:80 --name flask-app flask-app
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
+            # Stop and remove any existing container
+            docker stop flask-app || true
+            docker rm flask-app || true
+            docker rmi flask-app || true
+
+            # Clone the project if not already present
+            if [ ! -d ~/flask-Project ]; then
+              git clone https://github.com/mohsin786-sudo/flask-Project.git ~/flask-Project
+            fi
+
+            # Go to project directory
+            cd ~/flask-Project
+
+            # Pull latest changes
+            git pull
+
+            # Build and run Docker container
+            docker build -t flask-app .
+            docker run -d -p 80:80 --name flask-app flask-app
